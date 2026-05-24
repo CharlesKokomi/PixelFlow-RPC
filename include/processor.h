@@ -23,6 +23,7 @@ private:
     static void blurImage(const cv::Mat& src, cv::Mat& dst);
     static void invertImage(const cv::Mat& src, cv::Mat& dst);
     static void thresholdImage(const cv::Mat& src, cv::Mat& dst);
+    static void applyCartoonEffect(const cv::Mat& src, cv::Mat& dst);
 };
 
 #endif

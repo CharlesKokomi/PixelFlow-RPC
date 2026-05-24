@@ -18,7 +18,8 @@ spec:
       # --------------------------------------------------
       containers:
       - name: processor
-        image: swr.cn-south-1.myhuaweicloud.com/lmy_rpc/image-processor:v2
+        image: swr.cn-south-1.myhuaweicloud.com/lmy_rpc/image-processor:v2.2
+        imagePullPolicy: Always
         ports:
         - containerPort: 9000
         env:
