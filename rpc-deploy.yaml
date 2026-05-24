@@ -25,6 +25,13 @@ spec:
         env:
         - name: LD_LIBRARY_PATH
           value: "/app/lib"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "2000m"
 ---
 apiVersion: v1
 kind: Service

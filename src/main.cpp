@@ -82,10 +82,26 @@ int main() {
                 RpcHeader header;
 
                 // 1. 读取包头
-                int n = recv(client_fd, &header, sizeof(RpcHeader), 0);
-                if (n <= 0) {
-                    if (n < 0 && errno == EAGAIN) continue; 
-                    std::cout << "[System] 客户端连接关闭 FD: " << client_fd << std::endl;
+                int header_recv = 0;
+                char* header_ptr = (char*)&header;
+                bool read_failed = false;
+
+                while (header_recv < (int)sizeof(RpcHeader)) {
+                    int n = recv(client_fd, header_ptr + header_recv, sizeof(RpcHeader) - header_recv, 0);
+                    if (n <= 0) {
+                        if (n < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+                            // 非阻塞模式下数据还没准备好，微秒级等待后重试
+                            std::this_thread::sleep_for(std::chrono::microseconds(10));
+                            continue;
+                        }
+                        read_failed = true;
+                        break;
+                    }
+                    header_recv += n;
+                }
+
+                if (read_failed) {
+                    std::cout << "[System] 客户端连接异常关闭 FD: " << client_fd << std::endl;
                     epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_fd, NULL);
                     close(client_fd);
                     continue;
