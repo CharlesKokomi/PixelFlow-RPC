@@ -32,7 +32,6 @@ FROM ubuntu:24.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # 仅安装运行所需的动态库（不要安装 -dev 版，减小体积）
-# 注意：libprotobuf32t64 是 Ubuntu 24.04 的包名，22.04 可能是 libprotobuf23
 RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list.d/ubuntu.sources && \
     apt-get update && apt-get install -y \
     libprotobuf32t64 \
@@ -50,7 +49,7 @@ COPY --from=builder /build_context/build/server /app/server
 # 2. 拷贝 ONNX Runtime 库到 /app/lib (简化路径)
 COPY --from=builder /build_context/third_party/onnxruntime/lib/ /app/lib/
 
-# 3. 【关键】设置环境变量，告诉系统去这里找 .so
+# 3. 设置环境变量，告诉系统去这里找 .so
 ENV LD_LIBRARY_PATH=/app/lib
 
 # 4. 拷贝模型

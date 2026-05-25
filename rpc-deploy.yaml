@@ -12,10 +12,8 @@ spec:
       labels:
         app: image-rpc
     spec:
-      # --- 新增部分：告诉 K8s 使用 regcred 密钥来拉取镜像 ---
       imagePullSecrets:
       - name: regcred
-      # --------------------------------------------------
       containers:
       - name: processor
         image: swr.cn-south-1.myhuaweicloud.com/lmy_rpc/image-processor:v2.2
@@ -39,10 +37,10 @@ metadata:
   name: rpc-service
   namespace: default
   annotations:
-    # 这一行是关键，告诉 Prometheus 别来抓取这个 Service
+    #Prometheus不抓取这个Service
     prometheus.io/scrape: "false"
 spec:
-  # 提示：如果 LoadBalancer 一直 pending，可以改为 NodePort
+  # 如果LoadBalancer一直pending，可以改为NodePort
   type: LoadBalancer
   # type: NodePort 
   # externalTrafficPolicy: Local
