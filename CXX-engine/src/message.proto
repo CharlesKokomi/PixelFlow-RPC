@@ -1,0 +1,12 @@
+syntax = "proto3";
+package myrpc;
+
+message ImageRequest {
+    bytes image_data = 1;
+    string file_name = 2;
+}
+
+message ImageResponse {
+    bytes processed_data = 1;
+    bool success = 2;
+}
