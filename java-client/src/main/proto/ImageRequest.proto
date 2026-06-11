@@ -1,0 +1,13 @@
+syntax = "proto3";
+option java_package = "cn.edu.xmu.rpc";
+option java_outer_classname = "ImageProto";
+
+message ImageRequest {
+  bytes image_data = 1;//原始图片二进制
+  string file_name = 2;
+}
+
+message ImageResponse {
+  bytes processed_data = 1;//处理后图片
+  bool success = 2;
+}

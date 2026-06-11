@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RPC 图像处理演示平台</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<main class="app-shell">
+  <header class="hero" aria-labelledby="page-title">
+    <div class="hero-copy">
+      <p class="eyebrow">Cross-language RPC Middleware</p>
+      <h1 id="page-title">RPC 图像处理演示平台</h1>
+      <p class="lead">
+        上传图片后，Java 中间件通过 Netty + Protobuf 调用云端 C++ OpenCV 服务，并返回处理结果。
+      </p>
+    </div>
+
+
+  </header>
+
+  <section class="pipeline" aria-label="核心调用链路">
+    <span>Web 上传</span>
+    <span>Java 网关</span>
+    <span>RPC 协议</span>
+    <span>C++ OpenCV</span>
+    <span>结果返回</span>
+  </section>
+
+  <section class="workspace" aria-label="图像处理工作台">
+    <aside class="control-panel" aria-label="任务控制">
+      <div class="panel-heading">
+        <p>Task</p>
+        <h2>任务控制</h2>
+      </div>
+
+      <label class="upload-card" for="image-input">
+        <span class="upload-icon" aria-hidden="true">+</span>
+        <span>
+            <strong>选择图片</strong>
+            <small>支持 PNG / JPG / JPEG</small>
+          </span>
+      </label>
+      <input id="image-input" type="file" accept="image/png,image/jpeg,image/jpg">
+
+      <article class="file-card" aria-label="文件信息">
+        <span class="meta-label">当前文件</span>
+        <strong id="file-name">未选择图片</strong>
+        <dl class="file-details">
+          <div>
+            <dt>格式</dt>
+            <dd id="file-type">--</dd>
+          </div>
+          <div>
+            <dt>大小</dt>
+            <dd id="file-size">--</dd>
+          </div>
+        </dl>
+      </article>
+
+      <div class="panel-heading compact">
+        <p>Methods</p>
+        <h2>处理方法</h2>
+      </div>
+      <div class="button-grid" id="operation-buttons"></div>
+
+      <button class="secondary-button" id="clear-button" type="button">清空任务</button>
+    </aside>
+
+    <section class="stage" aria-label="原图与处理结果">
+      <div class="stage-toolbar">
+        <div>
+          <p class="eyebrow">Image Comparison</p>
+          <h2>原图 / 处理结果</h2>
+        </div>
+        <div class="active-method">
+          <span>当前方法</span>
+          <strong id="active-operation">未选择</strong>
+          <small id="active-operation-detail">请选择图片和处理方法</small>
+        </div>
+      </div>
+
+      <section class="preview-grid" aria-label="图片预览">
+        <article class="image-pane">
+          <header class="pane-header">
+            <span>Input</span>
+            <strong>原始图片</strong>
+          </header>
+          <div class="image-frame">
+            <img id="original-image" alt="上传的原始图片">
+            <div class="image-placeholder" id="original-placeholder">
+              <strong>等待上传</strong>
+              <small>选择图片后在此显示原图</small>
+            </div>
+          </div>
+        </article>
+
+        <article class="image-pane">
+          <header class="pane-header">
+            <span>Output</span>
+            <strong>处理结果</strong>
+          </header>
+          <div class="image-frame result-frame">
+            <img id="result-image" alt="处理后的图片">
+            <div class="image-placeholder" id="result-placeholder">
+              <strong>等待处理</strong>
+              <small>点击左侧方法后返回结果</small>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <div class="status-bar" id="status-bar" role="status" aria-live="polite">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="status-message">请选择一张 PNG 或 JPG 图片。</span>
+      </div>
+    </section>
+  </section>
+</main>
+<script src="./config.js"></script><script src="./config.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
