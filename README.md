@@ -46,7 +46,7 @@
    │   ├─ Pod #1 (replica)
    │   │   ├─ epoll_wait() 监听 listen_fd — 仅处理 accept
    │   │   ├─ accept() → setBlocking() → pool.enqueue(conn_fd)
-   │   │   └─ ThreadPool Worker (128)
+   │   │   └─ ThreadPool Worker (8)
    │   │       ├─ recv() Header (阻塞模式) → 校验 magic_number
    │   │       ├─ recv() Body → ParseFromArray()
    │   │       ├─ processor.process(type, raw_bytes)
@@ -70,7 +70,7 @@
 | **协议分层** | 定长二进制头 + Protobuf 变长体 | Protobuf 不自带长度前缀，定长头提供 `body_len` 用于分配接收缓冲区 |
 | **FD 生命周期** | accept → setBlocking → 线程池全权托管 → close | conn_fd 只被一个 Worker 线程持有，避免跨线程竞争和多路复用导致的 FD 重复触发 |
 | **Epoll 的定位** | 仅监听 listen_fd，不管理 conn_fd | 主线程只做 accept 分发，不在事件循环中读数据；Worker 线程用阻塞 I/O 串行完成读取-处理-写回 |
-| **线程池规模** | 128 worker threads | 并发瓶颈在图像解码/推理（CPU 密集型），线程数大于核数以覆盖 I/O 等待 |
+| **线程池规模** | 8 worker threads | 2 核节点上 8 线程利用并发度覆盖 I/O 等待，避免过多线程的上下文切换开销 |
 | **算力隔离** | Prometheus/Grafana 通过 `nodeSelector` + `tolerations` 固定至 `k3s-master` | 2 核 4 GB 节点上保护算力 Pod 的 CPU 配额不被监控组件挤占 |
 
 ---
@@ -215,18 +215,18 @@ spec:
     spec:
       containers:
       - name: processor
-        image: swr.cn-south-1.myhuaweicloud.com/lmy_rpc/image-processor:v2.2
+        image: swr.cn-south-1.myhuaweicloud.com/lmy_rpc/image-processor:v2.4
         resources:
           requests:
-            memory: "256Mi"
+            memory: "512Mi"
             cpu: "500m"
           limits:
-            memory: "1Gi"
+            memory: "2560Mi"
             cpu: "2000m"
 ```
 
 - **`replicas: 2`**：3 节点集群上 2 副本覆盖单节点宕机。K3s 调度器以 `preferredDuringScheduling` 反亲和性分散 Pod。
-- **`limits.memory: 1Gi`**：2 核 4 GB 节点上限制每个 Pod 内存上限，OOM Kill 不波及同节点其他 Pod。
+- **`limits.memory: 2560Mi`**：2 核 4 GB 节点上 2.5 Gi 上限同时为 OpenCV/ONNX 推理留足内存余量，OOM Kill 不波及同节点其他 Pod。
 - **`limits.cpu: 2000m`**：允许 burst 至 2 核，CFS 层面防止单 Pod 耗尽节点 CPU。
 
 #### 3.3.2 算力隔离：Prometheus & Grafana 调度策略 (`k8s-deploy/monitoring/monitor-values.yaml`)
@@ -415,10 +415,10 @@ PixelFlow-RPC/
 | 指标 | 值 |
 |:---|:---|
 | **最大并发连接数** | `MAX_EVENTS` (1024)，受系统 fd 限制 |
-| **线程池规模** | 128 worker threads / Pod |
+| **线程池规模** | 8 worker threads / Pod |
 | **Pod 副本数** | 2（可水平扩展） |
 | **每 Pod CPU 限制** | 2000m (2 核) |
-| **每 Pod 内存限制** | 1 Gi |
+| **每 Pod 内存限制** | 2560 Mi |
 | **Prometheus 指标保留** | 48 小时 |
 | **通信协议开销** | 16 字节固定头 + Protobuf 变长体 |
 
