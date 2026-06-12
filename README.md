@@ -1,6 +1,6 @@
 # PixelFlow-RPC — 跨语言云原生图像处理引擎
 
-> \\\\\\\*\\\\\\\*A Cross-Language, Cloud-Native Image Processing Engine with Epoll-Driven I/O\\\\\\\*\\\\\\\*
+> A Cross-Language, Cloud-Native Image Processing Engine with Epoll-Driven I/O
 
 \---
 
